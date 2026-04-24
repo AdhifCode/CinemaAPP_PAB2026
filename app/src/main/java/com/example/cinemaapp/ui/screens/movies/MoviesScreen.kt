@@ -30,7 +30,6 @@ fun MoviesScreen(
             .background(DeepNavy),
         contentPadding = PaddingValues(bottom = 100.dp)
     ) {
-        // ── Screen title ──────────────────────────────────────────────────────
         item {
             Spacer(modifier = Modifier.height(20.dp))
             Text(
@@ -49,14 +48,12 @@ fun MoviesScreen(
             )
         }
 
-        // ── Categories header ─────────────────────────────────────────────────
         item {
             Spacer(modifier = Modifier.height(24.dp))
             SectionHeader(title = "Categories", actionLabel = "See all")
             Spacer(modifier = Modifier.height(14.dp))
         }
 
-        // ── Category chips horizontal row ─────────────────────────────────────
         item {
             LazyRow(
                 contentPadding        = PaddingValues(horizontal = 20.dp),
@@ -71,14 +68,12 @@ fun MoviesScreen(
             }
         }
 
-        // ── Popular header ────────────────────────────────────────────────────
         item {
             Spacer(modifier = Modifier.height(28.dp))
             SectionHeader(title = "Popular", actionLabel = "See all")
             Spacer(modifier = Modifier.height(14.dp))
         }
 
-        // ── Movie poster carousel ─────────────────────────────────────────────
         item {
             LazyRow(
                 contentPadding        = PaddingValues(horizontal = 20.dp),
@@ -93,14 +88,12 @@ fun MoviesScreen(
             }
         }
 
-        // ── Now Showing header ────────────────────────────────────────────────
         item {
             Spacer(modifier = Modifier.height(28.dp))
             SectionHeader(title = "Now Showing", actionLabel = "See all")
             Spacer(modifier = Modifier.height(14.dp))
         }
 
-        // ── Second movie row (reversed for variety) ───────────────────────────
         item {
             LazyRow(
                 contentPadding        = PaddingValues(horizontal = 20.dp),
