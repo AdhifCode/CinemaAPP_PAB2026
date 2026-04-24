@@ -331,32 +331,32 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Demo hint
-            Card(
-                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text(
-                        text = "Demo Credentials",
-                        color = NeonGreen,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Email: demo@cinemaapp.com",
-                        color = TextSecondary,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = "Password: cinema123",
-                        color = TextSecondary,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
+//            // Demo hint
+//            Card(
+//                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+//                shape = RoundedCornerShape(12.dp),
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Column(modifier = Modifier.padding(12.dp)) {
+//                    Text(
+//                        text = "Demo Credentials",
+//                        color = NeonGreen,
+//                        style = MaterialTheme.typography.labelLarge,
+//                        fontWeight = FontWeight.SemiBold
+//                    )
+//                    Spacer(modifier = Modifier.height(4.dp))
+//                    Text(
+//                        text = "Email: demo@cinemaapp.com",
+//                        color = TextSecondary,
+//                        style = MaterialTheme.typography.bodySmall
+//                    )
+//                    Text(
+//                        text = "Password: cinema123",
+//                        color = TextSecondary,
+//                        style = MaterialTheme.typography.bodySmall
+//                    )
+//                }
+//            }
 
             Spacer(modifier = Modifier.height(32.dp))
         }

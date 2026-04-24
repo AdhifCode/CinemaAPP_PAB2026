@@ -12,12 +12,12 @@ data class ProfileUiState(
 
 class ProfileViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileUiState(profile = UserProfile(
-        name            = "Budi Santoso",
-        email           = "demo@cinemaapp.com",
-        membershipTier  = "Gold",
-        moviesWatched   = 47,
-        ticketsBought   = 83,
-        points          = 1240
+        name            = "Nadhifal Azharuddiya",
+        email           = "nadhifalazharuddiya@gmail.com",
+        membershipTier  = "Bronze",
+        moviesWatched   = 0,
+        ticketsBought   = 0,
+        points          = 0
     )))
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 }

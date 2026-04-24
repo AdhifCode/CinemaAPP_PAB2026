@@ -24,8 +24,8 @@ class LoginViewModel : ViewModel() {
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     // Demo credentials
-    private val validEmail    = "demo@cinemaapp.com"
-    private val validPassword = "cinema123"
+    private val validEmail    = "nadhifalazharuddiya@gmail.com"
+    private val validPassword = "nadhif123"
 
     fun onEmailChange(email: String) {
         _uiState.value = _uiState.value.copy(email = email, emailError = null, loginError = null)

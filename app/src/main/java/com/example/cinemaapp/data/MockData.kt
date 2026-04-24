@@ -199,13 +199,13 @@ object MockData {
 
     val currentUser = com.example.cinemaapp.data.model.UserProfile(
         id             = 1,
-        name           = "Budi Santoso",
-        email          = "demo@cinemaapp.com",
+        name           = "Nadhifal Azharuddiya",
+        email          = "nadhifalazharuddiya@gmail.com",
         phone          = "+62 812-3456-7890",
         city           = "Jakarta",
         membershipTier = "Gold",
-        moviesWatched  = 47,
-        ticketsBought  = 83,
-        points         = 1240
+        moviesWatched  = 0,
+        ticketsBought  = 0,
+        points         = 0
     )
 }

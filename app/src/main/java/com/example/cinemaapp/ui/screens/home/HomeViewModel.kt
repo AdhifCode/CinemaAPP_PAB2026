@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 data class HomeUiState(
-    val userName: String          = "Alex",
-    val greeting: String          = "Good Evening 👋",
+    val userName: String          = "Nadhifal",
+    val greeting: String          = "Good Night 👋",
     val coupons: List<Coupon>     = emptyList(),
     val isLoading: Boolean        = false
 )

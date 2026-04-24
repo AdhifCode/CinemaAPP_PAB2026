@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+// Extension property — satu instance per Context
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "session_prefs")
 
 object SessionKeys {
@@ -23,6 +24,7 @@ data class SessionData(
 
 class SessionManager(private val context: Context) {
 
+    /** Flow yang selalu up-to-date dengan data sesi terkini */
     val sessionFlow: Flow<SessionData> = context.dataStore.data.map { prefs ->
         SessionData(
             name  = prefs[SessionKeys.USER_NAME]  ?: "",
@@ -30,6 +32,7 @@ class SessionManager(private val context: Context) {
         )
     }
 
+    /** Simpan sesi setelah Login / Signup berhasil */
     suspend fun saveSession(name: String, email: String) {
         context.dataStore.edit { prefs ->
             prefs[SessionKeys.USER_NAME]  = name
@@ -37,6 +40,7 @@ class SessionManager(private val context: Context) {
         }
     }
 
+    /** Hapus sesi saat Sign Out */
     suspend fun clearSession() {
         context.dataStore.edit { prefs ->
             prefs.remove(SessionKeys.USER_NAME)
