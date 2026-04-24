@@ -23,7 +23,7 @@ import com.example.cinemaapp.ui.theme.*
 @Composable
 fun SeatSelectionScreen(
     onBack: () -> Unit = {},
-    onBuyTicket: () -> Unit = {},
+    onBuyTicket: (Int, String) -> Unit = { _, _ -> },
     viewModel: SeatViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -39,7 +39,7 @@ fun SeatSelectionScreen(
                     "$0.00"
                 else
                     summary.formattedTotal,
-                onBuyClick    = onBuyTicket
+                onBuyClick    = { onBuyTicket(summary.selectedSeatCount, summary.formattedTotal) }
             )
         }
     ) { innerPadding ->
