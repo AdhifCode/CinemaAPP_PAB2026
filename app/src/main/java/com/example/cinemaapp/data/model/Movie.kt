@@ -9,7 +9,12 @@ data class Movie(
     val rating: Float,             // e.g. 4.5f
     val genre: String,             // e.g. "Action"
     val duration: String,          // e.g. "2h 15m"
-    @DrawableRes val posterRes: Int
+    @DrawableRes val posterRes: Int,
+    val description: String = "",
+    val director: String = "",
+    val cast: String = "",
+    val year: Int = 2024,
+    val trailerUrl: String = ""    // YouTube embed URL (WebView) atau placeholder
 )
 
 data class MovieCategory(
