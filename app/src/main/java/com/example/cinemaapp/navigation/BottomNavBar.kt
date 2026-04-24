@@ -29,26 +29,31 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.cinemaapp.ui.theme.*
 
 private data class BottomNavItem(
-    val label:       String,
-    val route:       String,
-    val selectedIcon: ImageVector,
+    val label:         String,
+    val route:         String,
+    val selectedIcon:  ImageVector,
     val unselectedIcon: ImageVector
 )
 
 private val navItems = listOf(
-    BottomNavItem("Home",    Routes.HOME,   Icons.Filled.Home,         Icons.Outlined.Home),
-    BottomNavItem("Movies",  Routes.MOVIES, Icons.Filled.LocalActivity, Icons.Outlined.LocalActivity),
-    BottomNavItem("Coupons", Routes.HOME,   Icons.Filled.Redeem,        Icons.Outlined.Redeem),
-    BottomNavItem("Profile", Routes.HOME,   Icons.Filled.Person,        Icons.Outlined.Person),
+    BottomNavItem("Home",    Routes.HOME,    Icons.Filled.Home,          Icons.Outlined.Home),
+    BottomNavItem("Movies",  Routes.MOVIES,  Icons.Filled.LocalActivity,  Icons.Outlined.LocalActivity),
+    BottomNavItem("Coupons", Routes.HOME,    Icons.Filled.Redeem,         Icons.Outlined.Redeem),
+    BottomNavItem("Profile", Routes.PROFILE, Icons.Filled.Person,         Icons.Outlined.Person),
 )
+
+// Route-route yang menyembunyikan bottom nav
+private val routesWithoutBottomNav = setOf(Routes.SEATS, Routes.LOGIN)
 
 @Composable
 fun BottomNavBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute      = navBackStackEntry?.destination?.route
 
-    // Hide bottom nav on seat selection screen
-    if (currentRoute == Routes.SEATS) return
+    // Sembunyikan bottom nav di halaman tertentu
+    if (currentRoute in routesWithoutBottomNav) return
+    // Sembunyikan juga di payment (route-nya dinamis)
+    if (currentRoute?.startsWith("payment/") == true) return
 
     Box(
         modifier = Modifier
@@ -62,16 +67,22 @@ fun BottomNavBar(navController: NavController) {
             verticalAlignment     = Alignment.CenterVertically
         ) {
             navItems.forEach { item ->
-                val isSelected = currentRoute == item.route &&
-                        item.route != Routes.HOME ||
-                        currentRoute == Routes.HOME && item.label == "Home"
+                val isSelected = when (item.label) {
+                    "Home"    -> currentRoute == Routes.HOME
+                    "Movies"  -> currentRoute == Routes.MOVIES
+                    "Coupons" -> false  // belum ada route dedicated
+                    "Profile" -> currentRoute == Routes.PROFILE
+                    else      -> false
+                }
 
                 BottomNavItemView(
                     item       = item,
                     isSelected = isSelected,
                     onClick    = {
-                        if (currentRoute != item.route) {
-                            navController.navigate(item.route) {
+                        // Coupons belum punya screen sendiri — arahkan ke HOME
+                        val targetRoute = if (item.label == "Coupons") Routes.HOME else item.route
+                        if (currentRoute != targetRoute) {
+                            navController.navigate(targetRoute) {
                                 popUpTo(Routes.HOME) { saveState = true }
                                 launchSingleTop = true
                                 restoreState    = true
@@ -116,8 +127,8 @@ private fun BottomNavItemView(
         }
         Spacer(modifier = Modifier.height(3.dp))
         Text(
-            text  = item.label,
-            color = if (isSelected) NeonGreen else TextSecondary,
+            text     = item.label,
+            color    = if (isSelected) NeonGreen else TextSecondary,
             fontSize = 10.sp
         )
     }
