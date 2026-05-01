@@ -13,6 +13,7 @@ coil                    = "2.6.0"
 junit                   = "4.13.2"
 junitExt                = "1.1.5"
 espresso                = "3.5.1"
+datastore               = "1.1.1"
 
 [libraries]
 # Core
@@ -45,6 +46,9 @@ hilt-navigation-compose         = { group = "androidx.hilt",       name = "hilt-
 
 # Coil (Image Loading)
 coil-compose                    = { group = "io.coil-kt",          name = "coil-compose",             version.ref = "coil" }
+
+# DataStore
+androidx-datastore-preferences  = { group = "androidx.datastore",  name = "datastore-preferences",    version.ref = "datastore" }
 
 # Testing
 junit                           = { group = "junit",               name = "junit",                    version.ref = "junit" }
