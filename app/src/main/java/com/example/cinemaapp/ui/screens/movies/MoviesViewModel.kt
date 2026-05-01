@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.update
 data class MoviesUiState(
     val categories:    List<MovieCategory> = emptyList(),
     val popularMovies: List<Movie>         = emptyList(),
-    val isLoading:     Boolean             = false
+    val isLoading:     Boolean             = false,
+    val selectedMovie: Movie?              = null,
+    val showBottomSheet: Boolean           = false,
+    val showAlertDialog: Boolean           = false
 )
 
 class MoviesViewModel : ViewModel() {
@@ -40,5 +43,21 @@ class MoviesViewModel : ViewModel() {
                 }
             )
         }
+    }
+
+    fun onMovieClicked(movie: Movie) {
+        _uiState.update { it.copy(selectedMovie = movie, showBottomSheet = true) }
+    }
+
+    fun dismissBottomSheet() {
+        _uiState.update { it.copy(showBottomSheet = false, selectedMovie = null) }
+    }
+
+    fun onSeeAllClicked() {
+        _uiState.update { it.copy(showAlertDialog = true) }
+    }
+
+    fun dismissAlertDialog() {
+        _uiState.update { it.copy(showAlertDialog = false) }
     }
 }
