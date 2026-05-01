@@ -95,6 +95,9 @@ dependencies {
     // ── Image Loading ─────────────────────────────────────────────────────────
     implementation(libs.coil.compose)
 
+    // ── DataStore ─────────────────────────────────────────────────────────────
+    implementation(libs.androidx.datastore.preferences)
+
     // ── Debug Only ────────────────────────────────────────────────────────────
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
