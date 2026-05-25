@@ -24,7 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cinemaapp.ui.components.*
 import com.example.cinemaapp.ui.theme.*
 import kotlinx.coroutines.launch
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MoviesScreen(
     onMovieClick: (movieId: Int) -> Unit = {},
-    viewModel: MoviesViewModel = viewModel()
+    viewModel: MoviesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState()

@@ -27,14 +27,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cinemaapp.ui.theme.*
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
     onNavigateToRegister: () -> Unit = {},
-    viewModel: LoginViewModel = viewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }

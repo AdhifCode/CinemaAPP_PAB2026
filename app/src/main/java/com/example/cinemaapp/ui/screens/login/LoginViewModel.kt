@@ -2,11 +2,14 @@ package com.example.cinemaapp.ui.screens.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cinemaapp.data.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class LoginUiState(
     val email: String = "",
@@ -18,14 +21,13 @@ data class LoginUiState(
     val isLoggedIn: Boolean = false
 )
 
-class LoginViewModel : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
-
-    // Demo credentials
-    private val validEmail    = "nadhifalazharuddiya@gmail.com"
-    private val validPassword = "nadhif123"
 
     fun onEmailChange(email: String) {
         _uiState.value = _uiState.value.copy(email = email, emailError = null, loginError = null)
@@ -59,17 +61,19 @@ class LoginViewModel : ViewModel() {
             return
         }
 
-        // Simulate network call
+        // Call repository
         viewModelScope.launch {
             _uiState.value = state.copy(isLoading = true, loginError = null)
             delay(1500) // Simulate API delay
 
-            if (state.email == validEmail && state.password == validPassword) {
+            val result = userRepository.login(state.email, state.password)
+
+            result.onSuccess {
                 _uiState.value = _uiState.value.copy(isLoading = false, isLoggedIn = true)
-            } else {
+            }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    loginError = "Invalid email or password. Try the demo credentials below."
+                    loginError = error.message ?: "Login failed. Try the demo credentials below."
                 )
             }
         }

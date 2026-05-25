@@ -23,16 +23,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cinemaapp.ui.theme.*
 
 @Composable
 fun ProfileScreen(
     onLogout: () -> Unit = {},
-    viewModel: ProfileViewModel = viewModel()
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val profile = uiState.profile
+    val profile = uiState.profile ?: return Box(
+        modifier = Modifier.fillMaxSize().background(DeepNavy),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(color = NeonGreen)
+    }
 
     Column(
         modifier = Modifier
@@ -67,7 +72,7 @@ fun ProfileScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = profile.name.first().uppercaseChar().toString(),
+                        text = profile.name.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextOnAccent
@@ -148,7 +153,10 @@ fun ProfileScreen(
 
         // Logout button
         OutlinedButton(
-            onClick = onLogout,
+            onClick = {
+                viewModel.logout()
+                onLogout()
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)

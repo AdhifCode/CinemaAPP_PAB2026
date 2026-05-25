@@ -1,12 +1,13 @@
 package com.example.cinemaapp.ui.screens.seats
 
 import androidx.lifecycle.ViewModel
-import com.example.cinemaapp.data.MockData
+import androidx.lifecycle.viewModelScope
 import com.example.cinemaapp.data.model.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import com.example.cinemaapp.data.repository.SeatRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class SeatUiState(
     val movieTitle:  String          = "Dune: Part Two",
@@ -14,7 +15,8 @@ data class SeatUiState(
     val seats:       List<Seat>      = emptyList(),
     val showDates:   List<ShowDate>  = emptyList(),
     val showTimes:   List<ShowTime>  = emptyList(),
-    val pricePerSeat: Double         = 15.017
+    val pricePerSeat: Double         = 15.017,
+    val isLoading:   Boolean         = true
 ) {
     val selectedSeats: List<Seat>
         get() = seats.filter { it.status == SeatStatus.SELECTED }
@@ -26,7 +28,10 @@ data class SeatUiState(
         )
 }
 
-class SeatViewModel : ViewModel() {
+@HiltViewModel
+class SeatViewModel @Inject constructor(
+    private val seatRepository: SeatRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SeatUiState())
     val uiState: StateFlow<SeatUiState> = _uiState.asStateFlow()
@@ -36,11 +41,27 @@ class SeatViewModel : ViewModel() {
     }
 
     private fun loadData() {
-        _uiState.value = _uiState.value.copy(
-            seats     = MockData.seats,
-            showDates = MockData.showDates,
-            showTimes = MockData.showTimes
-        )
+        viewModelScope.launch {
+            combine(
+                seatRepository.getSeats(),
+                seatRepository.getShowDates(),
+                seatRepository.getShowTimes()
+            ) { seats, dates, times ->
+                SeatUiState(
+                    seats = seats,
+                    showDates = dates,
+                    showTimes = times,
+                    isLoading = false
+                )
+            }.collect { newState ->
+                _uiState.update { it.copy(
+                    seats = newState.seats,
+                    showDates = newState.showDates,
+                    showTimes = newState.showTimes,
+                    isLoading = newState.isLoading
+                )}
+            }
+        }
     }
 
     // Toggle AVAILABLE ↔ SELECTED; ignore RESERVED and CLOSED

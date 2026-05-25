@@ -2,11 +2,14 @@ package com.example.cinemaapp.ui.screens.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cinemaapp.data.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class SignupUiState(
     val name: String = "",
@@ -22,7 +25,10 @@ data class SignupUiState(
     val isSignedUp: Boolean = false
 )
 
-class SignupViewModel : ViewModel() {
+@HiltViewModel
+class SignupViewModel @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignupUiState())
     val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
@@ -78,7 +84,17 @@ class SignupViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = state.copy(isLoading = true, signupError = null)
             delay(1200)
-            _uiState.value = _uiState.value.copy(isLoading = false, isSignedUp = true)
+
+            val result = userRepository.signup(state.name, state.email, state.password)
+
+            result.onSuccess {
+                _uiState.value = _uiState.value.copy(isLoading = false, isSignedUp = true)
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    signupError = error.message ?: "Signup failed. Please try again."
+                )
+            }
         }
     }
 }

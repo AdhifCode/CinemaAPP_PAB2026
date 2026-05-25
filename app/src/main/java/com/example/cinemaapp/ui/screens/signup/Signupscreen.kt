@@ -24,14 +24,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cinemaapp.ui.theme.*
 
 @Composable
 fun SignupScreen(
     onSignupSuccess: () -> Unit = {},
     onNavigateToLogin: () -> Unit = {},
-    viewModel: SignupViewModel = viewModel()
+    viewModel: SignupViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }

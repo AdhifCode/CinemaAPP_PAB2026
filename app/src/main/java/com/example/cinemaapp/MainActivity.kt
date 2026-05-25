@@ -13,7 +13,9 @@ import com.example.cinemaapp.navigation.AppNavGraph
 import com.example.cinemaapp.navigation.BottomNavBar
 import com.example.cinemaapp.ui.theme.CinemaAppTheme
 import com.example.cinemaapp.ui.theme.DeepNavy
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

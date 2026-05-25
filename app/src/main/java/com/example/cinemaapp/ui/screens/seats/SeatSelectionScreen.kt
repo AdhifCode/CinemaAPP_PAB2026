@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cinemaapp.ui.components.*
 import com.example.cinemaapp.ui.theme.*
 
@@ -24,7 +24,7 @@ import com.example.cinemaapp.ui.theme.*
 fun SeatSelectionScreen(
     onBack: () -> Unit = {},
     onBuyTicket: (Int, String) -> Unit = { _, _ -> },
-    viewModel: SeatViewModel = viewModel()
+    viewModel: SeatViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val summary  = uiState.ticketSummary

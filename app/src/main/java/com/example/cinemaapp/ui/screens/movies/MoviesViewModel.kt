@@ -1,24 +1,28 @@
 package com.example.cinemaapp.ui.screens.movies
 
 import androidx.lifecycle.ViewModel
-import com.example.cinemaapp.data.MockData
+import androidx.lifecycle.viewModelScope
 import com.example.cinemaapp.data.model.Movie
 import com.example.cinemaapp.data.model.MovieCategory
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import com.example.cinemaapp.data.repository.MovieRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class MoviesUiState(
     val categories:    List<MovieCategory> = emptyList(),
     val popularMovies: List<Movie>         = emptyList(),
-    val isLoading:     Boolean             = false,
+    val isLoading:     Boolean             = true,
     val selectedMovie: Movie?              = null,
     val showBottomSheet: Boolean           = false,
     val showAlertDialog: Boolean           = false
 )
 
-class MoviesViewModel : ViewModel() {
+@HiltViewModel
+class MoviesViewModel @Inject constructor(
+    private val movieRepository: MovieRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MoviesUiState())
     val uiState: StateFlow<MoviesUiState> = _uiState.asStateFlow()
@@ -28,20 +32,29 @@ class MoviesViewModel : ViewModel() {
     }
 
     private fun loadData() {
-        _uiState.value = _uiState.value.copy(
-            categories    = MockData.movieCategories,
-            popularMovies = MockData.popularMovies,
-            isLoading     = false
-        )
+        viewModelScope.launch {
+            combine(
+                movieRepository.getMovieCategories(),
+                movieRepository.getPopularMovies()
+            ) { categories, movies ->
+                MoviesUiState(
+                    categories = categories,
+                    popularMovies = movies,
+                    isLoading = false
+                )
+            }.collect { newState ->
+                _uiState.update { it.copy(
+                    categories = newState.categories,
+                    popularMovies = newState.popularMovies,
+                    isLoading = newState.isLoading
+                )}
+            }
+        }
     }
 
     fun onCategorySelected(categoryId: Int) {
-        _uiState.update { state ->
-            state.copy(
-                categories = state.categories.map { cat ->
-                    cat.copy(isSelected = cat.id == categoryId)
-                }
-            )
+        viewModelScope.launch {
+            movieRepository.saveSelectedCategory(categoryId)
         }
     }
 
