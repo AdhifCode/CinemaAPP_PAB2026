@@ -89,7 +89,7 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
                     navController.popBackStack()
                 },
                 onBuyTicket = { seatCount, totalPrice ->
-                    val safePrice = totalPrice.replace("/", "")
+                    val safePrice = java.net.URLEncoder.encode(totalPrice, "UTF-8")
                     navController.navigate("payment/$seatCount/$safePrice")
                 }
             )
@@ -104,7 +104,9 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
             )
         ) { backStackEntry ->
             val seatCount  = backStackEntry.arguments?.getInt("seatCount") ?: 0
-            val totalPrice = backStackEntry.arguments?.getString("totalPrice") ?: "$0.00"
+            val rawPrice   = backStackEntry.arguments?.getString("totalPrice") ?: "0.00"
+            // Decode back: "$45.05"
+            val totalPrice = java.net.URLDecoder.decode(rawPrice, "UTF-8")
 
             PaymentScreen(
                 seatCount        = seatCount,

@@ -43,7 +43,7 @@ private val navItems = listOf(
 )
 
 // Route-route yang menyembunyikan bottom nav
-private val routesWithoutBottomNav = setOf(Routes.SEATS, Routes.LOGIN)
+private val routesWithoutBottomNav = setOf(Routes.SEATS, Routes.LOGIN, Routes.SIGNUP)
 
 @Composable
 fun BottomNavBar(navController: NavController) {

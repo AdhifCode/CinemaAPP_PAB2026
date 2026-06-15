@@ -58,7 +58,7 @@ fun ProfileTopBar(
                     )
                 } else {
                     Text(
-                        text = userName.first().uppercaseChar().toString(),
+                        text = userName.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
                         style = MaterialTheme.typography.titleMedium,
                         color = NeonGreen,
                         fontWeight = FontWeight.Bold
