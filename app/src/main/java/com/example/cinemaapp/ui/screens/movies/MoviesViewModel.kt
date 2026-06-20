@@ -2,59 +2,103 @@ package com.example.cinemaapp.ui.screens.movies
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cinemaapp.data.ApiService
+import com.example.cinemaapp.data.MockData
 import com.example.cinemaapp.data.model.Movie
 import com.example.cinemaapp.data.model.MovieCategory
-import com.example.cinemaapp.data.repository.MovieRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import com.example.cinemaapp.data.model.TmdbResponse
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 data class MoviesUiState(
     val categories:    List<MovieCategory> = emptyList(),
     val popularMovies: List<Movie>         = emptyList(),
-    val isLoading:     Boolean             = true,
+    val nowShowingMovies: List<Movie>      = emptyList(),
+    val isLoading:     Boolean             = false,
     val selectedMovie: Movie?              = null,
     val showBottomSheet: Boolean           = false,
-    val showAlertDialog: Boolean           = false
+    val showAlertDialog: Boolean           = false,
+    val errorMessage: String?              = null
 )
 
-@HiltViewModel
-class MoviesViewModel @Inject constructor(
-    private val movieRepository: MovieRepository
-) : ViewModel() {
+class MoviesViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(MoviesUiState())
     val uiState: StateFlow<MoviesUiState> = _uiState.asStateFlow()
 
+    private val apiService = ApiService.create()
+    private val apiKey = "194b09e225cab0ce17e921eb9568c1c5"
+    private val imageBaseUrl = "https://image.tmdb.org/t/p/w500/"
+
     init {
-        loadData()
+        loadCategories()
+        fetchMoviesByCategory(1) // Default to first category
+        fetchNowShowing()
     }
 
-    private fun loadData() {
+    private fun loadCategories() {
+        _uiState.update { it.copy(categories = MockData.movieCategories) }
+    }
+
+    private fun fetchNowShowing() {
         viewModelScope.launch {
-            combine(
-                movieRepository.getMovieCategories(),
-                movieRepository.getPopularMovies()
-            ) { categories, movies ->
-                MoviesUiState(
-                    categories = categories,
-                    popularMovies = movies,
-                    isLoading = false
-                )
-            }.collect { newState ->
-                _uiState.update { it.copy(
-                    categories = newState.categories,
-                    popularMovies = newState.popularMovies,
-                    isLoading = newState.isLoading
-                )}
+            try {
+                val response = apiService.getNowPlayingMovies(apiKey)
+                _uiState.update { it.copy(nowShowingMovies = mapTmdbResponse(response)) }
+            } catch (e: Exception) {
+                // Handle error
             }
         }
     }
 
     fun onCategorySelected(categoryId: Int) {
+        _uiState.update { state ->
+            state.copy(
+                categories = state.categories.map { cat ->
+                    cat.copy(isSelected = cat.id == categoryId)
+                }
+            )
+        }
+        fetchMoviesByCategory(categoryId)
+    }
+
+    private fun fetchMoviesByCategory(categoryId: Int) {
         viewModelScope.launch {
-            movieRepository.saveSelectedCategory(categoryId)
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                val response = when (categoryId) {
+                    1 -> apiService.getPopularMovies(apiKey)
+                    2 -> apiService.getNowPlayingMovies(apiKey)
+                    3 -> apiService.getTopRatedMovies(apiKey)
+                    4 -> apiService.getUpcomingMovies(apiKey)
+                    else -> apiService.getPopularMovies(apiKey)
+                }
+                _uiState.update { it.copy(popularMovies = mapTmdbResponse(response), isLoading = false) }
+            } catch (e: Exception) {
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false, 
+                        errorMessage = "Failed to load movies: ${e.message}" 
+                    ) 
+                }
+            }
+        }
+    }
+
+    private fun mapTmdbResponse(response: TmdbResponse): List<Movie> {
+        return response.results.map { tmdbMovie ->
+            Movie(
+                id = tmdbMovie.id,
+                title = tmdbMovie.title,
+                rating = tmdbMovie.voteAverage,
+                genre = "Movie",
+                duration = tmdbMovie.releaseDate ?: "N/A",
+                posterUrl = imageBaseUrl + tmdbMovie.posterPath,
+                description = tmdbMovie.overview
+            )
         }
     }
 
