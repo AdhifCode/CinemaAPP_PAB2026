@@ -98,6 +98,10 @@ dependencies {
     // ── DataStore ─────────────────────────────────────────────────────────────
     implementation(libs.androidx.datastore.preferences)
 
+    // ── Retrofit ──────────────────────────────────────────────────────────────
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
+
     // ── Debug Only ────────────────────────────────────────────────────────────
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
