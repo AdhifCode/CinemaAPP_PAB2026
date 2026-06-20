@@ -14,6 +14,7 @@ junit                   = "4.13.2"
 junitExt                = "1.1.5"
 espresso                = "3.5.1"
 datastore               = "1.1.1"
+retrofit                = "2.9.0"
 
 [libraries]
 # Core
@@ -49,6 +50,10 @@ coil-compose                    = { group = "io.coil-kt",          name = "coil-
 
 # DataStore
 androidx-datastore-preferences  = { group = "androidx.datastore",  name = "datastore-preferences",    version.ref = "datastore" }
+
+# Retrofit
+retrofit-core                   = { group = "com.squareup.retrofit2", name = "retrofit",             version.ref = "retrofit" }
+retrofit-gson                   = { group = "com.squareup.retrofit2", name = "converter-gson",      version.ref = "retrofit" }
 
 # Testing
 junit                           = { group = "junit",               name = "junit",                    version.ref = "junit" }
