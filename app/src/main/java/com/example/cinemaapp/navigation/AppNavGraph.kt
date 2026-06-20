@@ -13,15 +13,14 @@ import com.example.cinemaapp.ui.screens.movies.MoviesScreen
 import com.example.cinemaapp.ui.screens.payment.PaymentScreen
 import com.example.cinemaapp.ui.screens.profile.ProfileScreen
 import com.example.cinemaapp.ui.screens.seats.SeatSelectionScreen
-import com.example.cinemaapp.ui.screens.signup.SignupScreen // <-- JANGAN LUPA IMPORT INI
+import com.example.cinemaapp.ui.screens.signup.SignupScreen
 
-// ── Route constants ────────────────────────────────────────────────────────────
 object Routes {
     const val LOGIN   = "login"
     const val SIGNUP  = "signup"
     const val HOME    = "home"
     const val MOVIES  = "movies"
-    const val SEATS   = "seats"
+    const val SEATS   = "seats/{movieTitle}"
     const val PROFILE = "profile"
     const val PAYMENT = "payment/{seatCount}/{totalPrice}"
 }
@@ -33,7 +32,6 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
         startDestination = Routes.LOGIN,
         modifier         = modifier
     ) {
-        // ── Login ─────────────────────────────────────────────────────────────
         composable(Routes.LOGIN) {
             LoginScreen(
                 onLoginSuccess = {
@@ -47,24 +45,19 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
             )
         }
 
-        // ── Signup ────────────────────────────────────────────────────────────
-        // INI ADALAH BAGIAN YANG KURANG SEBELUMNYA
         composable(Routes.SIGNUP) {
             SignupScreen(
                 onSignupSuccess = {
-                    // Jika sukses daftar, arahkan ke Home dan hapus tumpukan layar Login & Signup
                     navController.navigate(Routes.HOME) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 },
                 onNavigateToLogin = {
-                    // Jika batal dan ingin kembali ke Login
                     navController.popBackStack()
                 }
             )
         }
 
-        // ── Home ──────────────────────────────────────────────────────────────
         composable(Routes.HOME) {
             HomeScreen(
                 onNavigateToMovies = {
@@ -73,29 +66,31 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
             )
         }
 
-        // ── Movies ────────────────────────────────────────────────────────────
         composable(Routes.MOVIES) {
             MoviesScreen(
-                onMovieClick = { _ ->
-                    navController.navigate(Routes.SEATS)
+                onMovieClick = { movieTitle ->
+                    navController.navigate("seats/$movieTitle")
                 }
             )
         }
 
-        // ── Seat Selection ────────────────────────────────────────────────────
-        composable(Routes.SEATS) {
+        composable(
+            route = Routes.SEATS,
+            arguments = listOf(navArgument("movieTitle") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val movieTitle = backStackEntry.arguments?.getString("movieTitle") ?: "Movie"
             SeatSelectionScreen(
+                movieTitle = movieTitle,
                 onBack = {
                     navController.popBackStack()
                 },
                 onBuyTicket = { seatCount, totalPrice ->
-                    val safePrice = java.net.URLEncoder.encode(totalPrice, "UTF-8")
+                    val safePrice = totalPrice.replace("/", "")
                     navController.navigate("payment/$seatCount/$safePrice")
                 }
             )
         }
 
-        // ── Payment ───────────────────────────────────────────────────────────
         composable(
             route = Routes.PAYMENT,
             arguments = listOf(
@@ -104,9 +99,7 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
             )
         ) { backStackEntry ->
             val seatCount  = backStackEntry.arguments?.getInt("seatCount") ?: 0
-            val rawPrice   = backStackEntry.arguments?.getString("totalPrice") ?: "0.00"
-            // Decode back: "$45.05"
-            val totalPrice = java.net.URLDecoder.decode(rawPrice, "UTF-8")
+            val totalPrice = backStackEntry.arguments?.getString("totalPrice") ?: "Rp 0"
 
             PaymentScreen(
                 seatCount        = seatCount,
@@ -120,7 +113,6 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
             )
         }
 
-        // ── Profile ───────────────────────────────────────────────────────────
         composable(Routes.PROFILE) {
             ProfileScreen(
                 onLogout = {
