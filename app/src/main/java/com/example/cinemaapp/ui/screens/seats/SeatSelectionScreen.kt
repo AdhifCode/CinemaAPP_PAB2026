@@ -10,33 +10,39 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cinemaapp.ui.components.*
 import com.example.cinemaapp.ui.theme.*
 
 @Composable
 fun SeatSelectionScreen(
+    movieTitle: String,
     onBack: () -> Unit = {},
     onBuyTicket: (Int, String) -> Unit = { _, _ -> },
-    viewModel: SeatViewModel = hiltViewModel()
+    viewModel: SeatViewModel = viewModel()
 ) {
+    // Update movie title in ViewModel when screen is launched
+    LaunchedEffect(movieTitle) {
+        viewModel.updateMovieTitle(movieTitle)
+    }
+
     val uiState by viewModel.uiState.collectAsState()
     val summary  = uiState.ticketSummary
 
     Scaffold(
         containerColor = DeepNavy,
-        // ── Sticky bottom bar ─────────────────────────────────────────────────
         bottomBar = {
             BuyTicketBottomBar(
                 selectedCount = summary.selectedSeatCount,
                 totalPrice    = if (summary.selectedSeatCount == 0)
-                    "$0.00"
+                    "Rp 0"
                 else
                     summary.formattedTotal,
                 onBuyClick    = { onBuyTicket(summary.selectedSeatCount, summary.formattedTotal) }
@@ -52,7 +58,6 @@ fun SeatSelectionScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // ── Top Nav Bar ───────────────────────────────────────────────────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,20 +87,17 @@ fun SeatSelectionScreen(
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                // Balance spacer so title stays centered
                 Spacer(modifier = Modifier.size(48.dp))
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // ── Cinema screen curve ───────────────────────────────────────────
             CinemaScreenCurve(
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // ── Seat grid ─────────────────────────────────────────────────────
             SeatGrid(
                 seats      = uiState.seats,
                 columns    = 7,
@@ -105,14 +107,12 @@ fun SeatSelectionScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ── Legend ────────────────────────────────────────────────────────
             SeatLegend(
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // ── Divider ───────────────────────────────────────────────────────
             HorizontalDivider(
                 modifier  = Modifier.padding(horizontal = 20.dp),
                 thickness = 1.dp,
@@ -121,7 +121,6 @@ fun SeatSelectionScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ── Date selection ────────────────────────────────────────────────
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -148,7 +147,6 @@ fun SeatSelectionScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ── Time selection ────────────────────────────────────────────────
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
