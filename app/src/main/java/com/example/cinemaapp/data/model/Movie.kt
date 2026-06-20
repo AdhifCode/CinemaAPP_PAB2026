@@ -9,7 +9,8 @@ data class Movie(
     val rating: Float,             // e.g. 4.5f
     val genre: String,             // e.g. "Action"
     val duration: String,          // e.g. "2h 15m"
-    @DrawableRes val posterRes: Int,
+    @DrawableRes val posterRes: Int = 0,
+    val posterUrl: String? = null,
     val description: String = "",
     val director: String = "",
     val cast: String = "",
