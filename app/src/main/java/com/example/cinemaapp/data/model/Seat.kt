@@ -1,5 +1,8 @@
 package com.example.cinemaapp.data.model
 
+import java.text.NumberFormat
+import java.util.*
+
 /**
  * Represents a single cinema seat.
  * The grid is built from a List<Seat> ordered row-by-row.
@@ -33,9 +36,13 @@ data class ShowDate(
 
 data class TicketSummary(
     val selectedSeatCount: Int,
-    val pricePerSeat: Double,   // e.g. 15.05
-    val currency: String = "$"
+    val pricePerSeat: Double,   // e.g. 50000.0
+    val currency: String = "Rp"
 ) {
     val totalPrice: Double get() = selectedSeatCount * pricePerSeat
-    val formattedTotal: String get() = "$currency${"%.2f".format(totalPrice)}"
+    val formattedTotal: String 
+        get() {
+            val formatter = NumberFormat.getInstance(Locale("id", "ID"))
+            return "$currency ${formatter.format(totalPrice)}"
+        }
 }
