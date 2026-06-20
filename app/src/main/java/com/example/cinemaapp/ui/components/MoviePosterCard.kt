@@ -1,5 +1,6 @@
 package com.example.cinemaapp.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -38,12 +39,21 @@ fun MoviePosterCard(
             .clickable(onClick = onClick)
     ) {
         // Poster image
-        androidx.compose.foundation.Image(
-            painter = painterResource(id = movie.posterRes),
-            contentDescription = movie.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
+        if (movie.posterUrl != null) {
+            AsyncImage(
+                model = movie.posterUrl,
+                contentDescription = movie.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Image(
+                painter = painterResource(id = movie.posterRes),
+                contentDescription = movie.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
 
         // Gradient overlay at bottom
         Box(
