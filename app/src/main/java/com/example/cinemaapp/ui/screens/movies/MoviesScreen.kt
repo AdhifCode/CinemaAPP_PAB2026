@@ -24,7 +24,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.cinemaapp.ui.components.*
 import com.example.cinemaapp.ui.theme.*
 import kotlinx.coroutines.launch
@@ -32,8 +33,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoviesScreen(
-    onMovieClick: (movieId: Int) -> Unit = {},
-    viewModel: MoviesViewModel = hiltViewModel()
+    onMovieClick: (movieTitle: String) -> Unit = {},
+    viewModel: MoviesViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState()
@@ -64,6 +65,14 @@ fun MoviesScreen(
                 )
             }
 
+            if (uiState.isLoading) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = NeonGreen)
+                    }
+                }
+            }
+
             item {
                 Spacer(modifier = Modifier.height(24.dp))
                 SectionHeader(
@@ -91,7 +100,7 @@ fun MoviesScreen(
             item {
                 Spacer(modifier = Modifier.height(28.dp))
                 SectionHeader(
-                    title = "Popular",
+                    title = "Popular on TMDB",
                     actionLabel = "See all",
                     onActionClick = { viewModel.onSeeAllClicked() }
                 )
@@ -127,7 +136,7 @@ fun MoviesScreen(
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    items(uiState.popularMovies.reversed(), key = { "ns_${it.id}" }) { movie ->
+                    items(uiState.nowShowingMovies, key = { "now_${it.id}" }) { movie ->
                         MoviePosterCard(
                             movie = movie,
                             onClick = { viewModel.onMovieClicked(movie) }
@@ -173,15 +182,27 @@ fun MoviesScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = movie.posterRes),
-                            contentDescription = movie.title,
-                            modifier = Modifier
-                                .width(120.dp)
-                                .height(180.dp)
-                                .clip(RoundedCornerShape(12.dp)),
-                            contentScale = ContentScale.Crop
-                        )
+                        if (movie.posterUrl != null) {
+                            AsyncImage(
+                                model = movie.posterUrl,
+                                contentDescription = movie.title,
+                                modifier = Modifier
+                                    .width(120.dp)
+                                    .height(180.dp)
+                                    .clip(RoundedCornerShape(12.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(id = movie.posterRes),
+                                contentDescription = movie.title,
+                                modifier = Modifier
+                                    .width(120.dp)
+                                    .height(180.dp)
+                                    .clip(RoundedCornerShape(12.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = movie.title,
@@ -197,7 +218,7 @@ fun MoviesScreen(
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(text = movie.genre, color = TextSecondary, style = MaterialTheme.typography.bodySmall)
-                            Text(text = movie.duration, color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                            Text(text = "Release: ${movie.duration}", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -219,7 +240,7 @@ fun MoviesScreen(
                         onClick = {
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 viewModel.dismissBottomSheet()
-                                onMovieClick(movie.id)
+                                onMovieClick(movie.title)
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
